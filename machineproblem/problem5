@@ -1,0 +1,124 @@
+/*
+* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+*/
+ 
+package com.mycompany.mp2exer5;
+ 
+import java.util.Scanner;
+ 
+/**
+*
+* @author spbinuya
+*/
+public class Mp2exer5 {
+ 
+    static class Employee {
+    private final String name;
+    private final double hoursWorked;
+    private double hourlyRate;
+ 
+ 
+private static int employeeCount = 0;
+ 
+ 
+public Employee(String id, String name, double hoursWorked, double hourlyRate) {
+    this.name = name;
+    this.hoursWorked = hoursWorked;
+    this.hourlyRate = hourlyRate;
+employeeCount++;
+}
+ 
+public double getGrossPay() {
+    if (hoursWorked <= 40) {
+        return hoursWorked * hourlyRate;
+    } else {
+        return (40 * hourlyRate) + ((hoursWorked - 40) * hourlyRate * 1.5);
+}
+}
+ 
+public double getTax() {
+    double gross = getGrossPay();
+ 
+        if (gross < 10000) {
+            return gross * 0.05;
+        } else if (gross <= 20000) {
+            return gross * 0.10;
+        } else {
+            return gross * 0.15;
+}
+}
+ 
+public double getNetPay() {
+    return getGrossPay() - getTax();
+}
+ 
+public String getName() {
+    return name;
+}
+ 
+public static int getEmployeeCount() {
+    return employeeCount;
+}
+    }
+ 
+public static void main(String[] args) {
+        try (Scanner sc = new Scanner(System.in)) {
+            Employee[] employees = new Employee[10];
+            System.out.print("Enter number of employees: ");
+            int n = sc.nextInt();
+            sc.nextLine();
+            if (n < 1 || n > 10) {
+                System.out.println("Number of employees must be between 1 and 10.");
+                return;
+            }
+            for (int i = 0; i < n; i++) {
+                System.out.println("\nEmployee " + (i + 1));
+                System.out.print("ID: ");
+                String id = sc.nextLine();
+                System.out.print("Full Name: ");
+                String name = sc.nextLine();
+                double hoursWorked;
+                do {
+                    System.out.print("Hours Worked: ");
+                    hoursWorked = sc.nextDouble();
+                    if (hoursWorked < 0) {
+                        System.out.println("Hours worked cannot be negative.");
+                    }
+                } while (hoursWorked < 0);
+                double hourlyRate;
+                do {
+                    System.out.print("Hourly Rate: ");
+                    hourlyRate = sc.nextDouble();
+                    if (hourlyRate < 0) {
+                        System.out.println("Hourly rate cannot be negative.");
+                    }
+                } while (hourlyRate < 0);
+                sc.nextLine();
+                employees[i] = new Employee(id, name, hoursWorked, hourlyRate);
+            }
+            double totalNetPay = 0;
+            double highestNetPay = employees[0].getNetPay();
+            String highestEmployee = employees[0].getName();
+            System.out.println("\nPayroll Summary");
+            for (int i = 0; i < n; i++) {
+                double gross = employees[i].getGrossPay();
+                double tax = employees[i].getTax();
+                double net = employees[i].getNetPay();
+                System.out.println("\nEmployee: " + employees[i].getName());
+                System.out.printf("Gross Pay: %.2f%n", gross);
+                System.out.printf("Tax: %.2f%n", tax);
+                System.out.printf("Net Pay: %.2f%n", net);
+                totalNetPay += net;
+                if (net > highestNetPay) {
+                    highestNetPay = net;
+                    highestEmployee = employees[i].getName();
+                }
+            }
+            double averageNetPay = totalNetPay / n;
+            System.out.println("\nHighest Net Pay Employee: " + highestEmployee);
+            System.out.printf("Highest Net Pay Amount: %.2f%n", highestNetPay);
+            System.out.printf("Average Net Pay: %.2f%n", averageNetPay);
+            System.out.println("Employee Count: " + Employee.getEmployeeCount());
+        }
+}
+}
