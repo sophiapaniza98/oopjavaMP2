@@ -1,0 +1,171 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ */
+
+package com.mycompany.mp2problem6;
+
+import java.util.Scanner;
+
+/**
+ *
+ * @author sophi
+ */
+public class Mp2problem6 {
+
+    static class Student {
+        private String id;
+        private String fullName;
+
+public Student(String id, String fullName) {
+        this.id = id;
+        this.fullName = fullName;
+}
+
+public String getId() {
+    return id;
+}
+
+public String getFullName() {
+    return fullName;
+}
+}
+
+static class Course {
+    private final int capacity;
+    private final Student[] enrolledStudents;
+    private int enrolledCount;
+
+public Course(String courseCode, int capacity) {
+    this.capacity = capacity;
+    enrolledStudents = new Student[capacity];
+    enrolledCount = 0;
+}
+
+public boolean enroll(Student student) {
+
+    if (student == null) {
+        return false;
+}
+
+for (int i = 0; i < enrolledCount; i++) {
+    if (enrolledStudents[i].getId().equals(student.getId())) {
+        return false;
+}
+}
+
+    if (enrolledCount >= capacity) {
+        return false;
+}
+
+    enrolledStudents[enrolledCount] = student;
+    enrolledCount++;
+        return true;
+}
+
+public Student findStudent(String id) {
+for (int i = 0; i < enrolledCount; i++) {
+    if (enrolledStudents[i].getId().equals(id)) {
+        return enrolledStudents[i];
+}
+}
+        return null;
+}
+
+public void displayRoster() {
+System.out.println("\nfinal roster:");
+
+if (enrolledCount == 0) {
+System.out.println("no students enrolled");
+return;
+}
+
+for (int i = 0; i < enrolledCount; i++) {
+System.out.println(
+enrolledStudents[i].getId() + " - "
++ enrolledStudents[i].getFullName());
+}
+}
+
+public int getEnrolledCount() {
+return enrolledCount;
+}
+
+public int getRemainingSlots() {
+return capacity - enrolledCount;
+}
+    }
+
+public static void main(String[] args) {
+
+Scanner sc = new Scanner(System.in);
+
+System.out.print("enter course code: ");
+String courseCode = sc.nextLine();
+
+System.out.print("enter capacity: ");
+int capacity = sc.nextInt();
+sc.nextLine();
+
+Course course = new Course(courseCode, capacity);
+
+System.out.print("enter number of students in master list: ");
+int studentCount = sc.nextInt();
+sc.nextLine();
+
+Student[] masterStudents = new Student[studentCount];
+
+for (int i = 0; i < studentCount; i++) {
+
+System.out.println("\nstudent " + (i + 1));
+
+System.out.print("id: ");
+String id = sc.nextLine();
+
+System.out.print("full name: ");
+String name = sc.nextLine();
+
+masterStudents[i] = new Student(id, name);
+}
+
+System.out.print("\nenter number of enrollment attempts: ");
+int attempts = sc.nextInt();
+sc.nextLine();
+
+for (int i = 0; i < attempts; i++) {
+
+System.out.print("\nenter student id to enroll: ");
+String searchId = sc.nextLine();
+
+Student studentToEnroll = null;
+
+    for (Student masterStudent : masterStudents) {
+        if (masterStudent.getId().equals(searchId)) {
+            studentToEnroll = masterStudent;
+            break;
+        }
+    }
+
+    if (studentToEnroll == null) {
+System.out.println("student not found");
+}        else {
+
+if (course.findStudent(searchId) != null) {
+System.out.println("enrollment rejected: duplicate");
+} else if (course.getRemainingSlots() == 0) {
+System.out.println("enrollment rejected: course is full");
+} else if (course.enroll(studentToEnroll)) {
+System.out.println("enrollment successful");
+} else {
+System.out.println("enrollment failed");
+}
+}
+}
+
+course.displayRoster();
+
+System.out.println("\noccupied slots: " + course.getEnrolledCount());
+System.out.println("remaining slots: " + course.getRemainingSlots());
+
+sc.close();
+}
+}
