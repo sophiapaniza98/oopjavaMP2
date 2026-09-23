@@ -1,0 +1,240 @@
+/*
+* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+*/
+ 
+package com.mycompany.machineproblem4exer2;
+ 
+import java.util.Scanner;
+ 
+/**
+*
+* @author spbinuya
+*/
+public class Machineproblem4exer2 {
+ 
+    static class Book {
+       private String bookId;
+       private String title;
+       private boolean available;
+       // Constructor
+       Book(String bookId, String title) {
+           this.bookId = bookId;
+           this.title = title;
+           this.available = true;
+       }
+       public String getBookId() {
+           return bookId;
+       }
+       public String getTitle() {
+           return title;
+       }
+       public boolean isAvailable() {
+           return available;
+       }
+       public void setAvailable(boolean available) {
+           this.available = available;
+       }
+   }
+   // =========================
+   // MEMBER CLASS
+   // =========================
+   static class Member {
+       private String memberId;
+       private String name;
+       private Book[] borrowedBooks;
+       private int borrowedCount;
+       // Constructor
+       Member(String memberId, String name) {
+           this.memberId = memberId;
+           this.name = name;
+           this.borrowedBooks = new Book[3];
+           this.borrowedCount = 0;
+       }
+       public String getMemberId() {
+           return memberId;
+       }
+       public String getName() {
+           return name;
+       }
+       // Borrow a book
+       public boolean borrowBook(Book book) {
+           if (!book.isAvailable()) {
+               return false;
+           }
+           if (borrowedCount >= 3) {
+               return false;
+           }
+           borrowedBooks[borrowedCount] = book;
+           borrowedCount++;
+           book.setAvailable(false);
+           return true;
+       }
+       // Return a book
+       public boolean returnBook(String bookId) {
+           for (int i = 0; i < borrowedCount; i++) {
+               if (borrowedBooks[i].getBookId().equals(bookId)) {
+                   Book returnedBook = borrowedBooks[i];
+                   // Make the book available again
+                   returnedBook.setAvailable(true);
+                   // Shift the remaining books
+                   for (int j = i; j < borrowedCount - 1; j++) {
+                       borrowedBooks[j] = borrowedBooks[j + 1];
+                   }
+                   borrowedBooks[borrowedCount - 1] = null;
+                   borrowedCount--;
+                   return true;
+               }
+           }
+           return false;
+       }
+       // Display borrowed books
+       public void displayBorrowedBooks() {
+           System.out.println(name + " (" + memberId + "):");
+           if (borrowedCount == 0) {
+               System.out.println("  No borrowed books.");
+           } else {
+               for (int i = 0; i < borrowedCount; i++) {
+                   System.out.println(
+                       "  - " + borrowedBooks[i].getTitle()
+                   );
+               }
+           }
+       }
+   }
+   // =========================
+   // MAIN METHOD
+   // =========================
+   public static void main(String[] args) {
+       Scanner input = new Scanner(System.in);
+       // =========================
+       // INPUT BOOKS
+       // =========================
+       System.out.print("Enter number of books: ");
+       int bookCount = input.nextInt();
+       input.nextLine();
+       Book[] books = new Book[bookCount];
+       for (int i = 0; i < bookCount; i++) {
+           System.out.println("\nBook " + (i + 1));
+           System.out.print("Enter book ID: ");
+           String bookId = input.nextLine();
+           System.out.print("Enter book title: ");
+           String title = input.nextLine();
+           books[i] = new Book(bookId, title);
+       }
+       // =========================
+       // INPUT MEMBERS
+       // =========================
+       System.out.print("\nEnter number of members: ");
+       int memberCount = input.nextInt();
+       input.nextLine();
+       Member[] members = new Member[memberCount];
+       for (int i = 0; i < memberCount; i++) {
+           System.out.println("\nMember " + (i + 1));
+           System.out.print("Enter member ID: ");
+           String memberId = input.nextLine();
+           System.out.print("Enter member name: ");
+           String name = input.nextLine();
+           members[i] = new Member(memberId, name);
+       }
+       // =========================
+       // PROCESS ACTIONS
+       // =========================
+       System.out.print("\nEnter number of actions: ");
+       int actionCount = input.nextInt();
+       input.nextLine();
+       System.out.println("\n--- ACTION RESULTS ---");
+       for (int i = 0; i < actionCount; i++) {
+           System.out.println("\nAction " + (i + 1));
+           System.out.print("Enter member ID: ");
+           String memberId = input.nextLine();
+           System.out.print("Enter action (B/R): ");
+           char action = input.nextLine().charAt(0);
+           System.out.print("Enter book ID: ");
+           String bookId = input.nextLine();
+           Member selectedMember = null;
+           Book selectedBook = null;
+           // Find member
+           for (int j = 0; j < memberCount; j++) {
+               if (members[j].getMemberId().equals(memberId)) {
+                   selectedMember = members[j];
+                   break;
+               }
+           }
+           // Find book
+           for (int j = 0; j < bookCount; j++) {
+               if (books[j].getBookId().equals(bookId)) {
+                   selectedBook = books[j];
+                   break;
+               }
+           }
+           // Check if member and book exist
+           if (selectedMember == null) {
+               System.out.println("Action failed: Member not found.");
+               continue;
+           }
+           if (selectedBook == null) {
+               System.out.println("Action failed: Book not found.");
+               continue;
+           }
+           // BORROW
+           if (action == 'B' || action == 'b') {
+               if (!selectedBook.isAvailable()) {
+                   System.out.println(
+                       "Borrow failed: Book is unavailable."
+                   );
+               } else if (selectedMember.borrowBook(selectedBook)) {
+                   System.out.println(
+                       "Borrow successful: "
+                       + selectedBook.getTitle()
+                       + " borrowed by "
+                       + selectedMember.getName()
+                   );
+               } else {
+                   System.out.println(
+                       "Borrow failed: Member already has 3 books."
+                   );
+               }
+           // RETURN
+           } else if (action == 'R' || action == 'r') {
+               if (selectedMember.returnBook(bookId)) {
+                   System.out.println(
+                       "Return successful: "
+                       + selectedBook.getTitle()
+                       + " returned by "
+                       + selectedMember.getName()
+                   );
+               } else {
+                   System.out.println(
+                       "Return failed: Member does not have this book."
+                   );
+               }
+           } else {
+               System.out.println("Invalid action.");
+           }
+       }
+       // =========================
+       // BORROWED BOOK SUMMARY
+       // =========================
+       System.out.println("\n--- BORROWED BOOKS ---");
+       for (int i = 0; i < memberCount; i++) {
+           members[i].displayBorrowedBooks();
+       }
+      
+       System.out.println("\n--- AVAILABLE BOOKS ---");
+       boolean hasAvailableBooks = false;
+       for (int i = 0; i < bookCount; i++) {
+           if (books[i].isAvailable()) {
+               System.out.println(
+                   books[i].getBookId()
+                   + " - "
+                   + books[i].getTitle()
+               );
+               hasAvailableBooks = true;
+           }
+       }
+       if (!hasAvailableBooks) {
+           System.out.println("No books are currently available.");
+       }
+       input.close();
+   }
+}
